@@ -1,0 +1,13 @@
+grpcio
+h5py
+matplotlib
+numpy
+pandas
+protobuf
+scikit_learn
+scipy
+tslearn
+cryptography
+requests
+asyncio
+ctuFaultDetector==1.1.0
