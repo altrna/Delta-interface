@@ -58,7 +58,8 @@ class MyClient(ClientBase):
             Iterator[NumpyArray]: An iterator of NumpyArray messages defined in protobuf file.
         """
         id = 0
-        for array in self.yield_test():# run_opc_ua():#self.yield_test(): # delta nebo test
+        # for array in self.yield_test(): # delta nebo test
+        for array in run_opc_ua():
             if client.stop_stream:
                 self.logger.info("Stream closed")
                 break
