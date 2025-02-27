@@ -60,38 +60,45 @@
             border: 2px solid #444;
         }
         #predictions {
-            width: 70%;
+            width: 60%;
             margin-top: 20px;
             padding: 20px;
-            border-radius: 6px;
-            background-color: #2d2d2d;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            max-height: 300px;
-            overflow-y: auto;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;  /* Enables scrolling */
+            max-height: calc(5 * 80px); /* Adjust height based on item height */
+            min-height: calc(5 * 60px);
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column; /* Keeps newest at the top */
         }
+
         .prediction-item {
-            padding: 12px;
+            padding: 10px;
             margin-bottom: 10px;
-            border-bottom: 1px solid #555;
-            color: #ccc;
-            background: #3a3a3a;
-            border-radius: 5px;
+            border-bottom: 1px solid #eee;
+            color: #555;
+            min-height: 50px; /* Ensures uniform height for all items */
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Pushes button to right */
         }
+
         .prediction-item.predicted-anomaly {
             background-color: #8b0000;
             color: #fff;
         }
         .wrong-btn {
-            background-color: #ff5733;
-            padding: 8px 14px;
-            border: none;
+            margin-left: auto;
+            padding: 6px 12px;
+            background-color: #FF5733;
             color: white;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            border-radius: 4px;
-            margin-left: 10px;
+            transition: background-color 0.3s;
         }
+
         .wrong-btn:hover {
             background-color: #c70039;
         }
@@ -126,18 +133,27 @@
         socket.on('update_predictions', function(predictions) {
             var predictionsElement = document.getElementById('predictions');
             predictionsElement.innerHTML = ''; // Clear existing predictions
-            predictions.slice(-5).reverse().forEach(function(pred) {
+
+            predictions.reverse().forEach(function(pred) { // Keep all predictions, newest at top
                 var newPred = document.createElement('div');
                 newPred.classList.add('prediction-item');
+
                 if (pred.result) {
                     newPred.classList.add('predicted-anomaly');
                 }
+
                 var date = new Date(pred.timestamp * 1000);
-                newPred.innerHTML = date.toLocaleTimeString() + ' - Process ID: ' + pred.id + ' - Result: ' + pred.result + ' - Length: ' + pred.series_len +
+                newPred.innerHTML =
+                    date.toLocaleTimeString() +
+                    ' - Process identifier: ' + pred.id +
+                    ' - Result: <b>' + (pred.result ? "Anomaly" : "Normal") + '</b>' +
+                    ' - Time series length: ' + pred.series_len +
                     ' <button class="wrong-btn" onclick="markAsWrong(\'' + pred.id + '\', \'' + pred.result + '\')">Mark as Wrong</button>';
+
                 predictionsElement.appendChild(newPred);
             });
         });
+
 
         window.markAsWrong = function(predictionId, prediction) {
             socket.emit('wrong_prediction', { id: predictionId, prediction_res: prediction });
